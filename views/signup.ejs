@@ -7,29 +7,33 @@
     <link rel="stylesheet" href="css/style.css">
     <title>The Conversation</title>
 </head>
-<body class="bodySignup">
-<div class="signUpContainer">
-<div class="itemsContainer">
-<h1 class="signUpLabel">Sign Up To Join "The Conversation" </h1>
-<h2 class="whiteText">Get the latest gossip and talk with others by becoming a part of "The Conversation" today!</h2>
-    <form action="/signup" method="POST">
-        <input type="text" class="loginAndEmailInput" name="userName" placeholder="User Name">
-       
-        <input type="email" class="loginAndEmailInput" name="email" placeholder="Email">
-        
-        <input type="password" name="password" class="loginAndEmailInput" id="userPass" placeholder="Password"> 
-        
-        <input type="password" name="confirmPassword" class="loginAndEmailInput" id="userPass2" placeholder="Confirm Password">
-        
-        <input class="signupSubmitButton" type="submit" value="Submit Sign-Up">
+<body>
+    <%- include('./partials/navbarPlain') -%>
+<div class="container align-items-center">
 
+
+<h1>Create an account </h1>
+<h4 class="whiteText">Empower your Health and Mind</h2>
+<div class="col-lg-6">
+    <form action="/signup" method="POST">
+
+            <input type="text" class="form-control mb-4" name="userName" placeholder="User Name">
+        
+            <input type="email" class="form-control mb-4" name="email" placeholder="Email">
+            
+            <input type="password" name="userPass" class="form-control mb-4" id="userPass" placeholder="Password"> 
+            
+            <input type="password" name="confirmPassword" class="form-control mb-4" id="userPass2" placeholder="Confirm Password">
+            
+            <input class="btn btn-outline-primary" type="submit" value="Submit Sign-Up">
         
     </form>
+</div>
 
-    <button id="showPasswordButton" class="button" onclick="showPassword(), showPassword2()">Show Password</span>
+    <button id="showPasswordButton" class="btn btn-primary mr-4" onclick="showPassword(), showPassword2()">Show Password</span>
     <!-- <input type="checkbox" onclick="showPassword(), showPassword2()">  -->
 
-    <button id="returnToLogin" > <a href="/login"> Log in Instead </a></button>
+    <button id="returnToLogin" > <a class="btn btn-primary" href="/login"> Log in Instead </a></button>
 
     <% if (locals.messages.errors) { %>
         <% messages.errors.forEach( el => { %>
@@ -38,7 +42,7 @@
     <% } %>
 
 </div>
-</div>
+
 
 <script src="js/main.js"></script>
 <script src="js/showPass.js"></script>

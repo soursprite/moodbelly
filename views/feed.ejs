@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body id="body-comments">
+
+    <%- include('./partials/navbar') -%>
+
+    <div class="container">
+        <form action="/feed/postDaily" method='POST'>
+            
+            <div class="row-12 flexRow mb-4">
+                <div class="col marRight">
+                    <div class="form-outline">
+                        <label class="form-label" for="meat">Meat</label>
+                        <input class="form-control" type="number" name='meat' />
+                    </div>
+                </div>
+                <div class="col marRight">
+                    <div class="form-outline">
+                        <label class="form-label" for="veg">Veg</label>
+                        <input class="form-control" type="number" name='veg' />
+                    </div>
+                </div>
+                <div class="col marRight">
+                    <div class="form-outline">
+                        <label class="form-label" for="starch">Starch</label>
+                        <input class="form-control" type="number" name='starch' />
+                    </div>
+                </div>
+                <div class="col marRight">
+                    <div class="form-outline">
+                        <label class="form-label" for="water">Water</label>
+                        <input class="form-control" type="number" name='water' />
+                    </div>
+                </div>
+                <div class="flexCol dropdown">
+               
+                    <label class="form-label" for="mood">Mood</label>
+                    <select class="form-select" name="mood">
+                        <option class="dropdown-item" value="5"><i class="fa-regular fa-face-grin-stars"></i> Great!</option>
+                        <option class="dropdown-item" value="4"><i class="fa-regular fa-face-grin"></i> Good</option>
+                        <option class="dropdown-item" value="3" selected><i class="fa-regular fa-face-meh"></i> Okay</option>
+                        <option class="dropdown-item" value="2"><i class="fa-regular fa-face-frown-open"></i> Poor</option>
+                        <option class="dropdown-item" value="1"><i class="fa-regular fa-face-tired"></i> Terrible</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex-col align-items-center">
+                <textarea class="form-control" placeholder="Description" name='description'></textarea>
+                <input class="btn btn-outline-primary" type="submit">
+            </div>
+            
+        </form>
+
+        <hr />
+
+
+            <% dailyPosts.reverse() %>
+            <div class="row justify-content-between mt-4">
+                <div class="col-lg-4">
+                    <h2>Daily Belly</h3>
+                    <ul class="list-unstyled">
+                        <%  const displayPosts = dailyPosts.forEach ( el => { %>
+                        <li data-id='<%=el._id%>'>
+                            <div class="card mb-4">
+                                <div class="card-body">
+
+                                    <div class="flexRow alignCent mb-2">
+                                        <i class="brown fa-solid fa-drumstick-bite fa-2x"></i><span class="marRight"><%= el.meat %></span>
+                                        <i class="orange fa-solid fa-carrot fa-2x"></i><span class="marRight"><%= el.veg %></span>
+                                        <i class="pooBrown fa-solid fa-bread-slice fa-2x"></i></i><span class="marRight"><%= el.starch %></span>
+                                        <i class="lightBlue fa-solid fa-droplet fa-2x"></i><span class="marRight"><%= el.water %></span>
+                                        <% if (el.mood === 5) { %><i class="bigIcon blue fa-regular fa-face-grin-stars"></i><% } 
+                                            else if (el.mood === 4) { %><i class="bigIcon green fa-regular fa-face-grin"></i><% } 
+                                            else if (el.mood === 3) { %><i class="bigIcon yeller fa-regular fa-face-meh"></i><% }
+                                            else if (el.mood === 2) { %><i class="bigIcon orange fa-regular fa-face-frown-open"></i><% } 
+                                            else { %><i class="bigIcon red fa-regular fa-face-tired"></i><% } %>
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        <p class="small mb-0 ms-2"><%= el.description %></p>
+                                    </div>
+
+                                    <div class="flexRow justify-content-between">
+                                        <div class="flexRow justify-content-between">
+                                            <div class="btn btn-raised btn-info marRight">Edit</div>
+                                            <a class="btn btn-raised btn-danger" href="/feed/deleteDay/<%= el.id %>">Delete</a>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <p class="small text-muted mb-0"><%= new Date(el.timeStamp * 1).toLocaleString() %></p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <% }) %>
+                    </ul>
+                </div>
+                <div class="flexRow col-lg-8">
+                    <h2>Insights</h2>
+                    <div class="flexRow justify-content-around">
+                        <div class="col-lg-5 flexCol align-items-center">
+                            <h3>7 Day Average Servings</h3>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <canvas id="sevenDay"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 flexCol align-items-center">
+                            <h3>Water consumption</h3>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <canvas id="waterChart" width="300" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 flexCol align-items-center">
+                            <h3>The Mood of the week</h3>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <canvas id="moodWeekChart" width="300" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        
+        
+        </ul>
+        
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.0/chart.min.js" integrity="sha512-asxKqQghC1oBShyhiBwA+YgotaSYKxGP1rcSYTDrB0U6DxwlJjU59B67U8+5/++uFjcuVM8Hh5cokLjZlhm3Vg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/js/bootstrap.bundle.min.js"></script>
+    <!--<script>document.getElementById("here").innerText = " HELLO";</script> -->
+
+</body>
+
+</html>

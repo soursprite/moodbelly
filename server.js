@@ -9,7 +9,7 @@ const flash = require('express-flash') // "Flash is an extension of connect-flas
 const logger = require('morgan') //middleware for console logging stuff
 const connectDB = require('./config/database')  //mondo db connection
 const mainRoutes = require('./routes/main') //router
-const commentsRoutes = require('./routes/comments') //router
+const dailyRoutes = require('./routes/daily') //router
 const { MongoClient } = require('mongodb')
 
 require('dotenv').config({path: './config/.env'}) // env file to hold our secret non-public data
@@ -41,7 +41,7 @@ app.use(passport.session())
 app.use(flash())
   
 app.use('/', mainRoutes) //router for root path
-app.use('/comments', commentsRoutes) //router for comments path
+app.use('/feed', dailyRoutes) //router for daily feed path
 
 // add Likes grab this fom the rapper app
 //app.put('/addOneLike', (request, response) => {

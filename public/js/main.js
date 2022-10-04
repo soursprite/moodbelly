@@ -1,123 +1,102 @@
-const deleteBtn = document.querySelectorAll('.del')
-const showMoreBtn = document.querySelectorAll('.showMore')
-const commentsItem = document.querySelectorAll('span.not')
-const commentsComplete = document.querySelectorAll('span.completed')
-const likeBtn = document.querySelectorAll('.like')
+let output
+let meatTotal, vegTotal, starchTotal, waterTotal, waterData
 
-Array.from(deleteBtn).forEach((el)=>{
-    el.addEventListener('click', deleteComments)
-})
-
-Array.from(likeBtn).forEach((el)=>{
-    el.addEventListener('click', addLike)
-})
-
-/*Array.from(showMoreBtn).forEach((el)=>{
-    el.addEventListener('click', showMore)
-})*/
-
-//create two arrays: one for all comments, one for shown comments ?
-//shift() from all comments, push() to shown comments
-
-async function deleteComments(){
-    const commentsId = this.parentNode.dataset.id
-    try{
-        const response = await fetch('comments/deleteComments', {
-            method: 'delete',
-            headers: {'Content-type': 'application/json'},
-            body: JSON.stringify({
-                'commentsIdFromJSFile': commentsId
-            })
+async function dataCall() { // get data
+    await fetch('/feed/getDayData', {
+        method: 'GET'
         })
-        const data = await response.json()
-        console.log(data)
-        location.reload()
-    }catch(err){
-        console.log(err)
-    }
+        .then((res) => res.json())
+        .then((data) => {
+            output =  data;
+            if (output.length > 7) {
+                output = output.slice(0,7)
+            }
+            console.log("data get!")
+        });
+
 }
 
 
-async function addLike(){
-    const commentsId = this.parentNode.dataset.id
-    // const likes = Number(this.parentNode.childNodes[5].innerText)
-    try{
-        const response = await fetch('comments/addOneLike', {
-            method: 'put',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                'commentsIdFromJSFile': commentsId
-            })
-        })
-        const data = await response.json()
-        console.log(data)
-        location.reload()
+async function prepData() {
+    await dataCall()
 
-    }catch(err){
-        console.log(err)
-    }
+    const meatData = output.map(x => x["meat"])
+    const vegData = output.map(x => x["veg"])
+    const starchData = output.map(x => x["starch"])
+    waterData = output.map((x,i) => [(i+1).toString(),x["water"]])
+
+    //7 day averages
+    meatTotal = meatData.reduce((a, c) => a + c,0)/7
+    vegTotal = vegData.reduce((a, c) => a + c,0)/7
+    starchTotal =starchData.reduce((a, c) => a + c,0)/7
+
+    waterTotal = waterData.reduce((a, c) => a + c,0)  
+    console.log(meatTotal, vegTotal, starchTotal, waterTotal)
+    
 }
 
-//ADD ARRAY: each comment will have a like
-//async function addLike(){
-//    const commentsId = this.parentNode.dataset.id
-//    const tLikes = Number(this.parentNode.dataset[5].innerText)
-//    try{
-//        const response = await fetch('comments/addOneLike', {
-//            method: 'put',
-//           headers: {'Content-Type': 'application/json'},
-//            body: JSON.stringify({
-//              'commentsIdFromJSFile': commentsId,
-//              'likesS': tLikes
-//            })
-//          })
-//        const data = await response.json()
-//        console.log(data)
-//        location.reload()
-//
-//    }catch(err){
-//        console.log(err)
-//    }
-//}
+async function chart7Day() {
+    await prepData();
+    const ctx = document.getElementById('sevenDay')
+    const myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Meat', 'Starch', 'Veg'],
+            datasets: [{
+                data: [meatTotal, starchTotal,  vegTotal],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(255, 206, 86)',
+                    'rgb(75, 192, 192)',
 
+                ],
+                borderWidth: 3
+            }]
+        }
+        
+    });
+}
 
+async function chartWater() {
+    await prepData();
+    console.log(waterData)
+    const ctx = document.getElementById('waterChart')
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+        },
+        data: {
+            datasets: [{
+                label: 'Water Consumed',
+                data: waterData.reverse(),
+                fill: true,
+                borderColor: 'rgb(75, 130, 192)',
+                tension: 0.1
+            }]
+        }
+    });
+}
 
-/*let comments = document.querySelectorAll(".commentItem")
-comments.forEach( x => x.classList.toggle("hidden"))*/
-
-/*function test() {
-    document.querySelector("#test").innerText+=comments
-}*/
+chart7Day()
+chartWater()
 
 /*
-let displaySet = 5
-let currentItems = 0
-
-const displayComments = function(x) { x.forEach ( el => {
-    document.querySelector("#comments").innerHTML("<li class='commentItem' data-id='<%=el._id%>'>"+el.comments+el.timeStamp+el.userName+"</li>")
-
-    //if (currentUserId == el.userId) { %> <span class='del'> Delete </span> <% }
-
-
-})}
-
-const displayNext = () => {
-    displayComments(comments.slice(currentItems, currentItems + displaySet));
-
-    if (!(currentItems + displaySet > comments.length)) {
-        currentItems += displaySet;
-    } else {
-        currentItems += (comments.length - currentItems)
-    }
+if (output.length <= 7) {
+    data = output
 }
-*/
-/*
-
-let comments = document.querySelectorAll(".commentItem")
-console.log(comments[2])
-console.log("This is working")
-for(let i = 5; i<13; i++) {
-
-    comments[i].classList.toggle("hidden")
+else {
+    data = output.slice(0,6)
 }
+
+const meatData = data.map(x => x["meat"])
+
+const meatTotal = meatData.reduce((a, c) => a + c,0) 
+console.log(meatTotal)
+
+document.getElementById("here").innerText = " HELLO";
 */

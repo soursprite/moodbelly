@@ -1,4 +1,4 @@
-const Comments = require('../models/Comments')
+const Daily = require('../models/daily')
 //const Main = require('js/main')
 
 // method to create comment stamped with user id
@@ -8,53 +8,57 @@ const Comments = require('../models/Comments')
 
 module.exports = {
 
-    getComments: async (req,res)=>{ //pulls up comments objs
-        console.log(req.user)
+    getDays: async (req,res)=>{ //pulls up post objs
+        //console.log(req.user)
         console.log("LOOKATME"+req.user.id)
         try{
-            const commentsItems = await Comments.find() //grab all objects
+            const dailyPosts = await Daily.find({ userId: req.user.id }) //grab all objects
             //maybe we need to cap how many results we get to a reasonable number
             //const itemsLeft = await Comments.countDocuments({userId:req.user.id,completed: false}) //we dont need this
             //res.render('../public/js/main.js', {comments: commentsItems, currentUserId: req.user.id})
             //res.status(200).send('/js/main.js', {comments: "test"})
             //this.dataDump(commentItems)
-            res.render('comments.ejs', {comments: commentsItems, currentUserId: req.user.id})
+            res.render('feed.ejs', {dailyPosts: dailyPosts, currentUser: req.user})
         }catch(err){
             console.log(err)
         }
     },
 
-    createComments: async (req, res)=>{
+    getDayData: async (req,res)=>{ //pulls up post objs
+        console.log(req.user)
+        console.log("request made")
         try{
-            await Comments.create({comments: req.body.commentsItem, timeStamp: Date.now(), userId: req.user.id, userName: req.user.userName, liked: req.user.liked, likes: req.body.likes}) //adds obj to mongo with userid
-            console.log('Comments has been added!')
-            res.redirect('/comments')
+            const dailyPosts = await Daily.find({ userId: req.user.id })
+            dailyPosts.reverse();
+            res.json(dailyPosts);
         }catch(err){
             console.log(err)
         }
     },
 
-    deleteComments: async (req, res)=>{
-        console.log(req.body.commentsIdFromJSFile)
+    postDaily: async (req, res)=>{
         try{
-            await Comments.findOneAndDelete({_id:req.body.commentsIdFromJSFile})
-            console.log('Deleted Comments')
-            res.json('Deleted It')
+            await Daily.create({meat: req.body.meat, veg: req.body.veg, starch: req.body.starch, water: req.body.water, mood: req.body.mood, description: req.body.description, userId: req.user.id, timeStamp: Date.now()}) //adds obj to mongo with userid
+            console.log('Feed has been updated!')
+            console.log(Date.now())
+            res.redirect('/feed')
+        }catch(err){
+            console.log(err)
+        }
+    },
+
+    deleteDay: async (req, res)=>{
+        console.log(req.params.id)
+        try{
+            res.redirect('/feed');
+            await Daily.findOneAndDelete({_id:req.params.id});
+            console.log('Deleted Post');
+            res.json('Deleted It');
         }catch(err){
             console.log("It screwed up here")
             console.log(err)
         }
-    },
-
-      addLike: async (req, res)=>{
-       try{
-           await Comments.findOneAndUpdate({_id: req.body.commentsIdFromJSFile}, {$inc: {likes: 1}})
-           console.log('Like has been added!')
-           res.redirect('/comments')
-       }catch(err){
-           console.log(err)
-       }
-   }
+    }
 }    
 
 
